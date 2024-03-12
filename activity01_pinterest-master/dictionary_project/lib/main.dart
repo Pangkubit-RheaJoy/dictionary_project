@@ -15,12 +15,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Dictionary',
+      title: 'Simple Dictionary App',
       theme: ThemeData(
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false, // Remove debug banner
-      home: const MyDictionaryApp(title: 'Dictionary Application'),
+      home: const MyDictionaryApp(title: 'Simple Dictionary App'),
     );
   }
 }
@@ -95,41 +95,65 @@ class _MyDictionaryAppState extends State<MyDictionaryApp> {
         child: Column(
           children: <Widget>[
             // Custom AppBar with Search Bar
-            Container(
-              height: 100,
-              color: Colors.indigo,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              alignment: Alignment.center,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _controller,
-                      decoration: InputDecoration(
-                        hintText: 'Search...',
-                        hintStyle: const TextStyle(color: Colors.white),
-                        border: InputBorder.none,
+            AppBar(
+              backgroundColor: Color(0xFF6B2A2A),
+              title: Text(
+                widget.title,
+                style: TextStyle(color: Colors.white, fontFamily: 'SerifDisplay'),
+              ),
+              actions: <Widget>[
+                IconButton(
+                  icon: Icon(Icons.account_circle, color: Colors.white),
+                  onPressed: () {
+                  },
+                ),
+              ],
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 50, vertical: 10),
+
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: Colors.grey,
+                    width: 1.0,
+                  ),
+                ),
+                // color: Color(0xFFE0E0E0),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                alignment: Alignment.center,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          hintText: 'Search...',
+                          hintStyle: const TextStyle(color: Colors.grey, fontFamily: 'SerifDisplay'),
+                          border: InputBorder.none,
+                        ),
+                        style: const TextStyle(color: Colors.grey, fontFamily: 'SerifDisplay'),
+                        keyboardType: TextInputType.text,
                       ),
-                      style: const TextStyle(color: Colors.white),
-                      keyboardType: TextInputType.text,
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _searchDictionary(_controller.text);
-                    },
-                    icon: const Icon(Icons.search, color: Colors.white),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      _controller.clear();
-                      setState(() {
-                        _searchResults = null;
-                      });
-                    },
-                    icon: const Icon(Icons.clear, color: Colors.white),
-                  ),
-                ],
+                    IconButton(
+                      onPressed: () {
+                        _searchDictionary(_controller.text);
+                      },
+                      icon: const Icon(Icons.search, color: Colors.grey),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        _controller.clear();
+                        setState(() {
+                          _searchResults = null;
+                        });
+                      },
+                      icon: const Icon(Icons.clear, color: Colors.grey),
+                    ),
+                  ],
+                ),
               ),
             ),
             if (_isLoading)
@@ -152,7 +176,12 @@ class _MyDictionaryAppState extends State<MyDictionaryApp> {
                             final pronunciations = _searchResults![index]['phonetics'] as List<dynamic>;
                             final audioUrl = pronunciations.isNotEmpty ? pronunciations[0]['audio'] : null;
                             final definitions = meanings[0]['definitions'] as List<dynamic>;
+                            final partOfSpeech = meanings[0]['partOfSpeech'] as String;
                             List<Widget> definitionWidgets = [];
+
+                            final wordData = _searchResults![index];
+                            final phonetics = wordData['phonetics'] as List<dynamic>;
+                            final phoneticText = phonetics.isNotEmpty ? (phonetics[0]['text'] as String) : '';
 
 
                             for (var i = 0; i < definitions.length; i++) {
@@ -161,7 +190,7 @@ class _MyDictionaryAppState extends State<MyDictionaryApp> {
                                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                                 child: Text(
                                   '${i + 1}. $definition',
-                                  style: const TextStyle(color: Colors.black),
+                                  style: const TextStyle(color: Color(0xFF2A2A2A), fontFamily: 'SourceSerif'),
                                 ),
                               );
                               definitionWidgets.add(definitionWidget);
@@ -180,9 +209,17 @@ class _MyDictionaryAppState extends State<MyDictionaryApp> {
                                       Text(
                                         word.toUpperCase(),
                                         style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.indigo,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: Color(0xFF1C1C1C),
+                                            fontFamily: 'SerifDisplay'
+                                        ),
+                                      ),
+                                      Text(
+                                        phoneticText.isNotEmpty ? " [$phoneticText]" : "",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.grey,
                                         ),
                                       ),
                                       if (audioUrl != null)
@@ -194,6 +231,23 @@ class _MyDictionaryAppState extends State<MyDictionaryApp> {
                                         ),
                                     ],
                                   ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(2.0),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        partOfSpeech.toLowerCase(),
+                                        style: const TextStyle(
+                                            fontSize: 12,
+                                            fontStyle: FontStyle.italic,
+                                            color: Color(0xFF4B4B4B),
+                                            fontFamily: 'SerifDisplay'
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+
                                 ),
                                 const Divider(
                                   color: Colors.grey,
@@ -210,7 +264,7 @@ class _MyDictionaryAppState extends State<MyDictionaryApp> {
                                     },
                                     child: const Text(
                                       'Show More',
-                                      style: TextStyle(color: Colors.blue),
+                                      style: TextStyle(color: Colors.blue, fontFamily: 'SourceSerif'),
                                     ),
                                   ),
                                 if (_showMore)
@@ -222,7 +276,7 @@ class _MyDictionaryAppState extends State<MyDictionaryApp> {
                                     },
                                     child: const Text(
                                       'Show Less',
-                                      style: TextStyle(color: Colors.blue),
+                                      style: TextStyle(color: Colors.blue, fontFamily: 'SourceSerif'),
                                     ),
                                   ),
                               ],
@@ -239,7 +293,7 @@ class _MyDictionaryAppState extends State<MyDictionaryApp> {
                   padding: const EdgeInsets.all(16),
                   child: Text(
                     'Definition not found',
-                    style: const TextStyle(color: Colors.black),
+                    style: const TextStyle(color: Colors.black, fontFamily: 'SourceSerif'),
                   ),
                 ),
             // Display predefined words alphabetically
@@ -270,8 +324,9 @@ class _MyDictionaryAppState extends State<MyDictionaryApp> {
                                       child: Text(
                                         predefinedWords[i],
                                         style: const TextStyle(
-                                          color: Colors.black87,
-                                          fontSize: 16,
+                                            color: Colors.black87,
+                                            fontSize: 16,
+                                            fontFamily: 'SerifDisplay'
                                         ),
                                       ),
                                     ),
